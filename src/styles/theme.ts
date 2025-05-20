@@ -1,17 +1,16 @@
 // src/styles/theme.ts
 import { createTheme } from '@mui/material/styles';
 
-// Create a theme instance
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#1976d2', // You can customize this color
+      main: '#1976d2',
       light: '#42a5f5',
       dark: '#1565c0',
       contrastText: '#fff',
     },
     secondary: {
-      main: '#f50057', // You can customize this color
+      main: '#f50057',
       light: '#ff4081',
       dark: '#c51162',
       contrastText: '#fff',
@@ -60,7 +59,7 @@ const theme = createTheme({
       fontWeight: 500,
     },
     button: {
-      textTransform: 'none', // Prevents all-caps buttons
+      textTransform: 'none',
     },
   },
   components: {

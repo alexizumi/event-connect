@@ -4,11 +4,9 @@ import { type Event } from '../hooks/useFirestore';
 /// <reference types="gapi" />
 /// <reference types="gapi.client" />
 
-// Cliente ID da sua aplicação OAuth
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 const API_KEY = import.meta.env.VITE_GOOGLE_API_KEY;
 
-// Verificação de variáveis de ambiente
 if (!CLIENT_ID) {
   console.error(
     'VITE_GOOGLE_CLIENT_ID não está definido nas variáveis de ambiente',
@@ -21,19 +19,14 @@ if (!API_KEY) {
   );
 }
 
-// Array de escopos de autorização necessários
 const SCOPES = ['https://www.googleapis.com/auth/calendar.events'];
 
 let tokenClient: google.accounts.oauth2.TokenClient;
 let gapiInited = false;
 let gisInited = false;
 
-/**
- * Inicializa a API do Google
- */
 export const initializeGoogleApi = async (): Promise<void> => {
   console.log('Inicializando Google API com CLIENT_ID:', CLIENT_ID);
-  // Carrega o cliente gapi
   if (!gapiInited) {
     await new Promise<void>((resolve) => {
       const script = document.createElement('script');
@@ -54,7 +47,6 @@ export const initializeGoogleApi = async (): Promise<void> => {
     });
   }
 
-  // Carrega o cliente de identidade do Google
   if (!gisInited) {
     await new Promise<void>((resolve) => {
       const script = document.createElement('script');
@@ -69,7 +61,7 @@ export const initializeGoogleApi = async (): Promise<void> => {
         tokenClient = window.google.accounts.oauth2.initTokenClient({
           client_id: CLIENT_ID,
           scope: SCOPES.join(' '),
-          callback: '', // Definido depois
+          callback: '',
         });
         gisInited = true;
         resolve();
@@ -79,9 +71,6 @@ export const initializeGoogleApi = async (): Promise<void> => {
   }
 };
 
-/**
- * Autentica o usuário e obtém autorização para usar a API
- */
 export const authorizeCalendarApi = (): Promise<void> => {
   return new Promise((resolve, reject) => {
     if (!tokenClient) {
@@ -89,7 +78,6 @@ export const authorizeCalendarApi = (): Promise<void> => {
       return;
     }
 
-    // Configura o callback para o cliente de token
     tokenClient.callback = (resp) => {
       if (resp.error) {
         reject(resp);
@@ -98,30 +86,22 @@ export const authorizeCalendarApi = (): Promise<void> => {
       }
     };
 
-    // Solicita um token de acesso
     if (gapi.client.getToken() === null) {
-      // Solicita um token de acesso
       tokenClient.requestAccessToken({ prompt: 'consent' });
     } else {
-      // Já tem um token
       tokenClient.requestAccessToken({ prompt: '' });
     }
   });
 };
 
-/**
- * Adiciona um evento ao Google Calendar do usuário
- */
 export const addEventToGoogleCalendar = async (
   event: Event,
 ): Promise<string> => {
   try {
-    // Certifique-se de que o usuário está autenticado
     if (!gapi.client.getToken()) {
       await authorizeCalendarApi();
     }
 
-    // Cria o evento no formato do Google Calendar
     const calendarEvent = {
       summary: event.title,
       description: event.description,
@@ -132,15 +112,13 @@ export const addEventToGoogleCalendar = async (
       end: {
         dateTime: new Date(
           new Date(event.date).getTime() + 3600000,
-        ).toISOString(), // Adiciona 1 hora como padrão
+        ).toISOString(),
         timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       },
     };
 
-    // Carrega explicitamente a API do Calendar antes de usá-la
     await gapi.client.load('calendar', 'v3');
 
-    // Insere o evento no calendário do usuário
     const response = await (gapi.client as any).calendar.events.insert({
       calendarId: 'primary',
       resource: calendarEvent,
@@ -153,7 +131,6 @@ export const addEventToGoogleCalendar = async (
   }
 };
 
-// Adicione tipos para o GAPI e Google Identity Services
 declare global {
   interface Window {
     gapi: typeof gapi;

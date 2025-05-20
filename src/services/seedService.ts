@@ -11,8 +11,6 @@ import {
   writeBatch,
 } from 'firebase/firestore';
 
-// Firebase configuration
-// Consider importing this from an environment file
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
@@ -22,7 +20,6 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
-// Types for our Firestore documents
 interface User {
   uid: string;
   email: string;
@@ -105,7 +102,6 @@ interface Registration {
   addedToCalendar: boolean;
 }
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
@@ -119,7 +115,6 @@ export const seedDatabase = async (useBatch: boolean = true): Promise<void> => {
     console.warn(
       'Warning: Attempting to seed database in production environment',
     );
-    // You might want to add additional safeguards here
   }
 
   try {
@@ -136,16 +131,12 @@ export const seedDatabase = async (useBatch: boolean = true): Promise<void> => {
   }
 };
 
-/**
- * Seeds the database using batch writes for better performance and atomicity
- */
 const seedWithBatch = async (): Promise<void> => {
   const batchCommits: Promise<void>[] = [];
   let currentBatch: WriteBatch = writeBatch(db);
   let operationCount = 0;
-  const MAX_OPERATIONS = 500; // Firestore limit is 500 operations per batch
+  const MAX_OPERATIONS = 500;
 
-  // Helper function to manage batch operations
   const addToBatch = (operation: () => void): void => {
     operation();
     operationCount++;
@@ -157,7 +148,6 @@ const seedWithBatch = async (): Promise<void> => {
     }
   };
 
-  // Users
   const user1: User = {
     uid: 'user123',
     email: 'maria.silva@example.com',
@@ -191,7 +181,6 @@ const seedWithBatch = async (): Promise<void> => {
   addToBatch(() => currentBatch.set(doc(db, 'users', 'user123'), user1));
   addToBatch(() => currentBatch.set(doc(db, 'users', 'user456'), user2));
 
-  // Categories
   const category: Category = {
     id: 'category123',
     name: 'Technology',
@@ -206,7 +195,6 @@ const seedWithBatch = async (): Promise<void> => {
     currentBatch.set(doc(db, 'categories', 'category123'), category),
   );
 
-  // Events
   const event: Event = {
     id: 'event123',
     title: 'React Workshop 2025',
@@ -242,7 +230,6 @@ const seedWithBatch = async (): Promise<void> => {
 
   addToBatch(() => currentBatch.set(doc(db, 'events', 'event123'), event));
 
-  // Event Attendees (subcollection)
   const attendee: EventAttendee = {
     userId: 'user123',
     displayName: 'Maria Silva',
@@ -260,7 +247,6 @@ const seedWithBatch = async (): Promise<void> => {
     ),
   );
 
-  // Registrations
   const registration: Registration = {
     id: 'reg123',
     eventId: 'event123',
@@ -277,12 +263,10 @@ const seedWithBatch = async (): Promise<void> => {
     currentBatch.set(doc(db, 'registrations', 'reg123'), registration),
   );
 
-  // Commit any remaining operations
   if (operationCount > 0) {
     batchCommits.push(currentBatch.commit());
   }
 
-  // Wait for all batch operations to complete
   await Promise.all(batchCommits);
 };
 
@@ -322,7 +306,6 @@ const seedWithIndividualWrites = async (): Promise<void> => {
     savedEvents: [],
   } as User);
 
-  // Categories
   await setDoc(doc(db, 'categories', 'category123'), {
     id: 'category123',
     name: 'Technology',
@@ -333,7 +316,6 @@ const seedWithIndividualWrites = async (): Promise<void> => {
     createdAt: Timestamp.fromDate(new Date('2024-03-01')),
   } as Category);
 
-  // Events
   await setDoc(doc(db, 'events', 'event123'), {
     id: 'event123',
     title: 'React Workshop 2025',
@@ -367,7 +349,6 @@ const seedWithIndividualWrites = async (): Promise<void> => {
     updatedAt: Timestamp.fromDate(new Date('2024-04-25')),
   } as Event);
 
-  // Event Attendees (subcollection)
   await setDoc(doc(db, 'events', 'event123', 'attendees', 'user123'), {
     userId: 'user123',
     displayName: 'Maria Silva',
@@ -378,7 +359,6 @@ const seedWithIndividualWrites = async (): Promise<void> => {
     notes: 'Would like to discuss job opportunities',
   } as EventAttendee);
 
-  // Registrations
   await setDoc(doc(db, 'registrations', 'reg123'), {
     id: 'reg123',
     eventId: 'event123',
@@ -400,18 +380,14 @@ export const clearSeedData = async (): Promise<void> => {
   try {
     const batch = writeBatch(db);
 
-    // Delete users
     batch.delete(doc(db, 'users', 'user123'));
     batch.delete(doc(db, 'users', 'user456'));
 
-    // Delete categories
     batch.delete(doc(db, 'categories', 'category123'));
 
-    // Delete events and subcollections
     batch.delete(doc(db, 'events', 'event123', 'attendees', 'user123'));
     batch.delete(doc(db, 'events', 'event123'));
 
-    // Delete registrations
     batch.delete(doc(db, 'registrations', 'reg123'));
 
     await batch.commit();
@@ -447,14 +423,11 @@ export const createDevSeedingControls = (): {
   };
 };
 
-// Add to seedService.ts
-
 export const createAdminUser = async (
   email: string,
   password: string,
 ): Promise<string> => {
   try {
-    // Only allow in development
     if (process.env.NODE_ENV !== 'development') {
       throw new Error('Admin creation only allowed in development');
     }
@@ -467,7 +440,6 @@ export const createAdminUser = async (
     );
     const uid = userCredential.user.uid;
 
-    // Create admin user document
     await setDoc(doc(db, 'users', uid), {
       uid,
       email,
@@ -491,7 +463,6 @@ export const createAdminUser = async (
   }
 };
 
-// Export types for use in other parts of the application
 export type {
   Category,
   Event,

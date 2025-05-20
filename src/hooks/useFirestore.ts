@@ -12,7 +12,6 @@ import {
 import { useState } from 'react';
 import { db } from '../services/firebase';
 
-// Event interface
 export interface Event {
   id?: string;
   title: string;
@@ -28,7 +27,6 @@ export const useEvents = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Get all events
   const getEvents = async () => {
     setLoading(true);
     try {
@@ -47,7 +45,6 @@ export const useEvents = () => {
     }
   };
 
-  // Get a single event by ID
   const getEvent = async (id: string) => {
     try {
       const eventDoc = doc(db, 'events', id);
@@ -62,7 +59,6 @@ export const useEvents = () => {
     }
   };
 
-  // Add a new event
   const addEvent = async (eventData: Omit<Event, 'id' | 'createdAt'>) => {
     try {
       const newEvent = {
@@ -77,7 +73,6 @@ export const useEvents = () => {
     }
   };
 
-  // Update an existing event
   const updateEvent = async (id: string, eventData: Partial<Event>) => {
     try {
       const eventRef = doc(db, 'events', id);
@@ -89,7 +84,6 @@ export const useEvents = () => {
     }
   };
 
-  // Delete an event
   const deleteEvent = async (id: string) => {
     try {
       await deleteDoc(doc(db, 'events', id));

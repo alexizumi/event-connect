@@ -24,13 +24,10 @@ const AddToGoogleCalendarButton = ({
     setError(null);
 
     try {
-      // Inicializa a API se ainda não foi inicializada
       await initializeGoogleApi();
 
-      // Adiciona o evento ao calendário
       const eventUrl = await addEventToGoogleCalendar(event);
 
-      // Abre o evento no Google Calendar em uma nova aba
       if (eventUrl) {
         window.open(eventUrl, '_blank');
       }

@@ -30,38 +30,31 @@ export default function Events() {
   const [sortBy, setSortBy] = useState('date');
   const eventsPerPage = 6;
 
-  // New event dialog state
   const [openNewEventDialog, setOpenNewEventDialog] = useState(false);
   const [newEventData, setNewEventData] = useState({
     title: '',
-    date: new Date().toISOString().split('T')[0], // Default to today
+    date: new Date().toISOString().split('T')[0],
     description: '',
     imageUrl: '',
-    createdBy: 'Current User', // Replace with actual user info
+    createdBy: 'Current User',
   });
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  // Use useCallback to prevent unnecessary re-renders
   const fetchEvents = useCallback(() => {
     console.log('Fetching events...');
     getEvents();
   }, [getEvents]);
 
-  // Only fetch events once when component mounts
   useEffect(() => {
     fetchEvents();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Empty dependency array to run only once
+  }, []);
 
-  // Apply filters when events, searchTerm, or sortBy changes
   useEffect(() => {
     console.log('Filtering events...', events.length);
 
-    // Apply filters and sorting
     let result = [...events];
 
-    // Apply search filter
     if (searchTerm) {
       result = result.filter(
         (event) =>
@@ -70,7 +63,6 @@ export default function Events() {
       );
     }
 
-    // Apply sorting
     result.sort((a, b) => {
       switch (sortBy) {
         case 'title':
@@ -87,7 +79,6 @@ export default function Events() {
     setFilteredEvents(result);
   }, [events, searchTerm, sortBy]);
 
-  // Pagination logic
   const pageCount = Math.ceil(filteredEvents.length / eventsPerPage);
   const displayedEvents = filteredEvents.slice(
     (page - 1) * eventsPerPage,
@@ -102,20 +93,18 @@ export default function Events() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // New event dialog handlers
   const handleOpenNewEventDialog = () => {
     setOpenNewEventDialog(true);
   };
 
   const handleCloseNewEventDialog = () => {
     setOpenNewEventDialog(false);
-    // Reset form data
     setNewEventData({
       title: '',
       date: new Date().toISOString().split('T')[0],
       description: '',
       imageUrl: '',
-      createdBy: 'Current User', // Replace with actual user info
+      createdBy: 'Current User',
     });
     setSubmitError(null);
   };
@@ -129,7 +118,6 @@ export default function Events() {
   };
 
   const handleSubmitNewEvent = async () => {
-    // Validate form data
     if (
       !newEventData.title ||
       !newEventData.date ||
@@ -143,7 +131,6 @@ export default function Events() {
     setSubmitError(null);
 
     try {
-      // Call the addEvent function from useEvents hook
       await addEvent({
         title: newEventData.title,
         date: newEventData.date,
@@ -152,7 +139,6 @@ export default function Events() {
         createdBy: newEventData.createdBy,
       });
 
-      // Close dialog and refresh events
       handleCloseNewEventDialog();
       fetchEvents();
     } catch (error) {
@@ -208,7 +194,6 @@ export default function Events() {
         </Button>
       </Box>
 
-      {/* Filters */}
       <Box sx={{ mb: 4 }}>
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, md: 6 }}>
@@ -219,7 +204,7 @@ export default function Events() {
               value={searchTerm}
               onChange={(e) => {
                 setSearchTerm(e.target.value);
-                setPage(1); // Reset to first page on search
+                setPage(1);
               }}
             />
           </Grid>
@@ -241,7 +226,6 @@ export default function Events() {
         </Grid>
       </Box>
 
-      {/* Events Grid */}
       {displayedEvents.length === 0 ? (
         <Alert severity="info">No events found matching your criteria.</Alert>
       ) : (
@@ -270,7 +254,6 @@ export default function Events() {
             })}
           </Grid>
 
-          {/* Pagination */}
           {pageCount > 1 && (
             <Box display="flex" justifyContent="center" sx={{ mt: 4 }}>
               <Pagination
@@ -285,7 +268,6 @@ export default function Events() {
         </>
       )}
 
-      {/* New Event Dialog */}
       <Dialog
         open={openNewEventDialog}
         onClose={handleCloseNewEventDialog}

@@ -19,7 +19,6 @@ const Navbar: React.FC = () => {
     <AppBar position="static" sx={{ width: '100%' }}>
       <Container maxWidth={false}>
         <Toolbar>
-          {/* Logo/Brand */}
           <Typography
             variant="h6"
             component={RouterLink}
@@ -34,7 +33,6 @@ const Navbar: React.FC = () => {
             EventConnect
           </Typography>
 
-          {/* Navigation Links */}
           <Box sx={{ flexGrow: 1, display: 'flex' }}>
             <Button
               component={RouterLink}
@@ -61,7 +59,6 @@ const Navbar: React.FC = () => {
             )}
           </Box>
 
-          {/* Auth Buttons */}
           <Box>
             {user ? (
               <>

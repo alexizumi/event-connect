@@ -15,7 +15,6 @@ const ProtectedRoute = ({
 }: ProtectedRouteProps) => {
   const { user, loading } = useAuth();
 
-  // Show loading indicator while checking authentication
   if (loading) {
     return (
       <Box
@@ -31,12 +30,10 @@ const ProtectedRoute = ({
     );
   }
 
-  // Redirect to login if not authenticated
   if (!user) {
     return <Navigate to={redirectTo} />;
   }
 
-  // Render children if authenticated
   return <>{children}</>;
 };
 
