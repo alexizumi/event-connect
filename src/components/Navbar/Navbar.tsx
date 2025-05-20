@@ -1,50 +1,85 @@
 // src/components/Navbar/Navbar.tsx
-import { AppBar, Box, Button, Toolbar, Typography } from '@mui/material';
-import { Link } from 'react-router-dom';
+
+import {
+  AppBar,
+  Box,
+  Button,
+  Container,
+  Toolbar,
+  Typography,
+} from '@mui/material';
+import React from 'react';
+import { Link as RouterLink } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 
-const Navbar = () => {
-  const { user, signOut } = useAuth();
+const Navbar: React.FC = () => {
+  const { user, isAdmin, signOut } = useAuth();
 
   return (
-    <AppBar position="static">
-      <Toolbar>
-        <Typography
-          variant="h6"
-          component={Link}
-          to="/"
-          sx={{ flexGrow: 1, textDecoration: 'none', color: 'white' }}
-        >
-          EventConnect
-        </Typography>
-        <Box sx={{ display: 'flex', gap: 2 }}>
-          <Button color="inherit" component={Link} to="/">
-            Home
-          </Button>
-          <Button color="inherit" component={Link} to="/events">
-            Events
-          </Button>
-          {user ? (
-            <>
-              <Button color="inherit" component={Link} to="/dashboard">
-                Dashboard
+    <AppBar position="static" sx={{ width: '100%' }}>
+      <Container maxWidth={false}>
+        <Toolbar>
+          {/* Logo/Brand */}
+          <Typography
+            variant="h6"
+            component={RouterLink}
+            to="/"
+            sx={{
+              mr: 2,
+              fontWeight: 700,
+              color: 'inherit',
+              textDecoration: 'none',
+            }}
+          >
+            EventConnect
+          </Typography>
+
+          {/* Navigation Links */}
+          <Box sx={{ flexGrow: 1, display: 'flex' }}>
+            <Button
+              component={RouterLink}
+              to="/"
+              sx={{ color: 'white', display: 'block', mx: 1 }}
+            >
+              Home
+            </Button>
+            <Button
+              component={RouterLink}
+              to="/events"
+              sx={{ color: 'white', display: 'block', mx: 1 }}
+            >
+              Events
+            </Button>
+            {isAdmin && (
+              <Button
+                component={RouterLink}
+                to="/admin"
+                sx={{ color: 'white', display: 'block', mx: 1 }}
+              >
+                Admin
               </Button>
-              <Button color="inherit" onClick={signOut}>
-                Logout
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button color="inherit" component={Link} to="/login">
+            )}
+          </Box>
+
+          {/* Auth Buttons */}
+          <Box>
+            {user ? (
+              <>
+                <Typography variant="body1" sx={{ display: 'inline', mr: 2 }}>
+                  Hi, {user.displayName}
+                </Typography>
+                <Button color="inherit" onClick={signOut}>
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <Button color="inherit" component={RouterLink} to="/login">
                 Login
               </Button>
-              <Button color="inherit" component={Link} to="/signup">
-                Sign Up
-              </Button>
-            </>
-          )}
-        </Box>
-      </Toolbar>
+            )}
+          </Box>
+        </Toolbar>
+      </Container>
     </AppBar>
   );
 };

@@ -7,7 +7,10 @@ import {
   CardMedia,
   Typography,
 } from '@mui/material';
+import { Timestamp } from 'firebase/firestore'; // Importe o Timestamp do Firebase
 import { Link } from 'react-router-dom';
+import AddToGoogleCalendarButton from '../../components/AddToGoogleCalendarButton';
+import { type Event } from '../../hooks/useFirestore'; // Importe o tipo Event
 
 interface EventCardProps {
   id: string;
@@ -24,6 +27,19 @@ const EventCard = ({
   imageUrl,
   description,
 }: EventCardProps) => {
+  // Crie um objeto event a partir das props individuais
+  const event: Event = {
+    id,
+    title,
+    date,
+    description,
+    imageUrl,
+    // Você precisará adicionar os outros campos obrigatórios do tipo Event
+    // Se não tiver esses valores, você pode usar valores padrão ou mock
+    createdBy: 'Unknown', // Valor padrão
+    createdAt: new Timestamp(Date.now() / 1000, 0), // Timestamp atual como fallback
+  };
+
   return (
     <Card
       sx={{
@@ -61,6 +77,9 @@ const EventCard = ({
         >
           View Details
         </Button>
+      </Box>
+      <Box sx={{ p: 2 }}>
+        <AddToGoogleCalendarButton event={event} />
       </Box>
     </Card>
   );

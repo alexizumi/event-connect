@@ -1,45 +1,34 @@
 // src/App.tsx
-import CssBaseline from '@mui/material/CssBaseline';
-import { ThemeProvider } from '@mui/material/styles';
+
+import { Box } from '@mui/material';
+import React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
-import theme from './styles/theme';
-
 import Navbar from './components/Navbar/Navbar';
-import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
-import Login from './pages/Auth/Login';
-import SignUp from './pages/Auth/SignUp';
-import Dashboard from './pages/Dashboard/Dashboard';
+import LoginPage from './pages/Auth/Login';
+import AdminPage from './pages/Dashboard/Dashboard';
 import EventDetails from './pages/Events/EventDetails';
-import Events from './pages/Events/Events';
-import Home from './pages/Home/Home';
+import EventsPage from './pages/Events/Events';
+import HomePage from './pages/Home/Home';
 
-function App() {
+const App: React.FC = () => {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <AuthProvider>
-        <BrowserRouter>
-          <Navbar />
+    <BrowserRouter>
+      <Box
+        sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}
+      >
+        <Navbar />
+        <Box component="main" sx={{ flexGrow: 1 }}>
           <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/events" element={<Events />} />
+            <Route path="/" element={<HomePage />} />
+            <Route path="/events" element={<EventsPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/admin" element={<AdminPage />} />
             <Route path="/events/:id" element={<EventDetails />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<SignUp />} />
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
           </Routes>
-        </BrowserRouter>
-      </AuthProvider>
-    </ThemeProvider>
+        </Box>
+      </Box>
+    </BrowserRouter>
   );
-}
+};
 
 export default App;
