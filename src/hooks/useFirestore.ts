@@ -20,6 +20,9 @@ export interface Event {
   imageUrl?: string;
   createdBy: string;
   createdAt: Timestamp;
+  location?: string;
+  price?: number;
+  eventUrl?: string;
 }
 
 export const useEvents = () => {

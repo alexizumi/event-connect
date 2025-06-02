@@ -37,6 +37,9 @@ export default function Events() {
     description: '',
     imageUrl: '',
     createdBy: 'Current User',
+    location: '',
+    price: 0,
+    eventUrl: '',
   });
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -105,23 +108,40 @@ export default function Events() {
       description: '',
       imageUrl: '',
       createdBy: 'Current User',
+      location: '',
+      price: 0,
+      eventUrl: '',
     });
     setSubmitError(null);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setNewEventData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+
+    if (name === 'price') {
+      const numericValue = value === '' ? 0 : parseFloat(value);
+      setNewEventData((prev) => ({
+        ...prev,
+        [name]: isNaN(numericValue) ? 0 : numericValue,
+      }));
+    } else {
+      setNewEventData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
   };
 
   const handleSubmitNewEvent = async () => {
     if (
-      !newEventData.title ||
+      !newEventData.title.trim() ||
       !newEventData.date ||
-      !newEventData.description
+      !newEventData.description.trim() ||
+      !newEventData.createdBy.trim() ||
+      !newEventData.location.trim() ||
+      newEventData.price === null ||
+      newEventData.price === undefined ||
+      newEventData.price < 0
     ) {
       setSubmitError('Please fill in all required fields');
       return;
@@ -131,13 +151,23 @@ export default function Events() {
     setSubmitError(null);
 
     try {
-      await addEvent({
-        title: newEventData.title,
+      const eventData = {
+        title: newEventData.title.trim(),
         date: newEventData.date,
-        description: newEventData.description,
-        imageUrl: newEventData.imageUrl || undefined,
-        createdBy: newEventData.createdBy,
-      });
+        description: newEventData.description.trim(),
+        createdBy: newEventData.createdBy.trim(),
+        location: newEventData.location.trim(),
+        price: Number(newEventData.price),
+        eventUrl: newEventData.eventUrl.trim(),
+        ...(newEventData.imageUrl.trim() && {
+          imageUrl: newEventData.imageUrl.trim(),
+        }),
+        ...(newEventData.eventUrl.trim() && {
+          eventUrl: newEventData.eventUrl.trim(),
+        }),
+      };
+
+      await addEvent(eventData);
 
       handleCloseNewEventDialog();
       fetchEvents();
@@ -293,6 +323,8 @@ export default function Events() {
             onChange={handleInputChange}
             required
             sx={{ mb: 2 }}
+            placeholder="Enter the event title"
+            helperText="Enter a descriptive title for the event"
           />
           <TextField
             margin="dense"
@@ -304,8 +336,14 @@ export default function Events() {
             value={newEventData.date}
             onChange={handleInputChange}
             required
-            InputLabelProps={{ shrink: true }}
             sx={{ mb: 2 }}
+            InputLabelProps={{
+              shrink: true,
+            }}
+            inputProps={{
+              min: new Date().toISOString().split('T')[0],
+            }}
+            helperText="Select the date of the event"
           />
           <TextField
             margin="dense"
@@ -320,6 +358,8 @@ export default function Events() {
             multiline
             rows={4}
             sx={{ mb: 2 }}
+            placeholder="Enter a detailed description of the event"
+            helperText="Provide a detailed description of the event"
           />
           <TextField
             margin="dense"
@@ -331,6 +371,54 @@ export default function Events() {
             value={newEventData.imageUrl}
             onChange={handleInputChange}
             sx={{ mb: 2 }}
+            helperText="Enter a valid image URL or leave empty for default"
+            placeholder="https://example.com/image.jpg"
+            required={false}
+          />
+          <TextField
+            margin="dense"
+            name="location"
+            label="Location (optional)"
+            type="text"
+            fullWidth
+            variant="outlined"
+            value={newEventData.location}
+            onChange={handleInputChange}
+            sx={{ mb: 2 }}
+            required
+            placeholder="Enter the event location"
+            helperText="Enter the location of the event (optional)"
+          />
+          <TextField
+            margin="dense"
+            name="price"
+            label="Price (0 for free events)"
+            type="number"
+            fullWidth
+            variant="outlined"
+            value={newEventData.price}
+            onChange={handleInputChange}
+            inputProps={{
+              min: 0,
+              step: 0.01,
+            }}
+            sx={{ mb: 2 }}
+            required
+            helperText="Enter 0 for free events"
+          />
+          <TextField
+            margin="dense"
+            name="eventUrl"
+            label="Event URL (optional)"
+            type="text"
+            fullWidth
+            variant="outlined"
+            value={newEventData.eventUrl}
+            onChange={handleInputChange}
+            sx={{ mb: 2 }}
+            placeholder="https://example.com/event"
+            helperText="Enter a valid URL for the event or leave empty"
+            required={false}
           />
           <TextField
             margin="dense"
