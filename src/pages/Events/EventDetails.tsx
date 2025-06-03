@@ -2,6 +2,8 @@
 
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CurrencyPoundIcon from '@mui/icons-material/CurrencyPound';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 import LinkIcon from '@mui/icons-material/Link';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import {
@@ -11,6 +13,11 @@ import {
   Chip,
   CircularProgress,
   Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   Divider,
   Link,
   Paper,
@@ -29,6 +36,7 @@ export default function EventDetails() {
   const navigate = useNavigate();
   const { getEvent } = useEvents();
   const { user } = useAuth();
+  const { deleteEvent } = useEvents();
   const {
     registerForEvent,
     checkRegistration,
@@ -43,6 +51,8 @@ export default function EventDetails() {
   const [isRegistered, setIsRegistered] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     const fetchEvent = async () => {
@@ -118,6 +128,49 @@ export default function EventDetails() {
     setSnackbarOpen(false);
   };
 
+  // Add this function to check if user is admin (you'll need to implement based on your auth system)
+  const isAdmin = () => {
+    // Replace this with your actual admin check logic
+    // For example: return user?.role === 'admin' || user?.isAdmin
+    return true; // Temporary - replace with actual logic
+  };
+
+  const handleDeleteEvent = async () => {
+    if (!id) {
+      setError('Event ID is missing');
+      return;
+    }
+    setDeleting(true);
+    try {
+      const success = await deleteEvent(id);
+
+      if (success) {
+        navigate('/events', {
+          state: {
+            message: 'Event deleted successfully',
+            severity: 'success',
+          },
+        });
+      } else {
+        throw new Error('Failed to delete event');
+      }
+    } catch (error) {
+      console.error('Error deleting event:', error);
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'Failed to delete event. Please try again.';
+      setSnackbarMessage(errorMessage);
+      setSnackbarOpen(true);
+      setDeleting(false);
+      setDeleteDialogOpen(false);
+    }
+  };
+
+  const handleEditEvent = () => {
+    navigate(`/events/${id}/edit`);
+  };
+
   if (loading) {
     return (
       <Box
@@ -131,7 +184,22 @@ export default function EventDetails() {
     );
   }
 
-  if (error || !event) {
+  {
+    if (error || !event) {
+      return (
+        <Container maxWidth="lg" sx={{ py: 4 }}>
+          <Button
+            startIcon={<ArrowBackIcon />}
+            onClick={handleGoBack}
+            sx={{ mb: 2 }}
+          >
+            Back to Events
+          </Button>
+          <Alert severity="error">{error || 'Event not found'}</Alert>
+        </Container>
+      );
+    }
+
     return (
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Button
@@ -141,386 +209,276 @@ export default function EventDetails() {
         >
           Back to Events
         </Button>
-        <Alert severity="error">{error || 'Event not found'}</Alert>
-      </Container>
-    );
-  }
 
-  return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Button
-        startIcon={<ArrowBackIcon />}
-        onClick={handleGoBack}
-        sx={{ mb: 2 }}
-      >
-        Back to Events
-      </Button>
-
-      <Paper elevation={3} sx={{ p: 3 }}>
-        {event.imageUrl && (
-          <Box
-            sx={{
-              height: 300,
-              backgroundImage: `url(${event.imageUrl})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              borderRadius: 1,
-              mb: 3,
-            }}
-          />
-        )}
-
-        <Typography variant="h3" component="h1" gutterBottom>
-          {event.title}
-        </Typography>
-
-        <Typography variant="h6" color="text.secondary" gutterBottom>
-          {new Date(event.date).toLocaleDateString(undefined, {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-          })}
-        </Typography>
-
-        {/* New Event Details Section */}
-        <Box sx={{ my: 3, display: 'flex', flexWrap: 'wrap', gap: 2 }}>
-          {event.location && (
-            <Chip
-              icon={<LocationOnIcon />}
-              label={event.location}
-              variant="outlined"
-              sx={{ fontSize: '0.9rem' }}
-            />
-          )}
-
-          {event.price !== undefined && event.price !== null && (
-            <Chip
-              icon={<CurrencyPoundIcon />}
-              label={event.price === 0 ? 'Free' : `£${event.price.toFixed(2)}`}
-              variant="outlined"
-              color={event.price === 0 ? 'success' : 'primary'}
-              sx={{ fontSize: '0.9rem' }}
-            />
-          )}
-
-          {event.eventUrl && (
-            <Chip
-              icon={<LinkIcon />}
-              label="Event Link"
-              variant="outlined"
-              component="a"
-              href={
-                event.eventUrl.startsWith('http')
-                  ? event.eventUrl
-                  : `https://${event.eventUrl}`
-              }
-              target="_blank"
-              rel="noopener noreferrer"
-              clickable
+        <Paper elevation={3} sx={{ p: 3 }}>
+          {event.imageUrl && (
+            <Box
               sx={{
-                fontSize: '0.9rem',
-                textDecoration: 'none',
-                '&:hover': {
-                  backgroundColor: 'action.hover',
-                },
+                height: 300,
+                backgroundImage: `url(${event.imageUrl})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                borderRadius: 1,
+                mb: 3,
               }}
             />
           )}
-        </Box>
 
-        <Divider sx={{ my: 3 }} />
+          <Typography variant="h3" component="h1" gutterBottom>
+            {event.title}
+          </Typography>
 
-        <Typography
-          variant="body1"
-          paragraph
-          sx={{ whiteSpace: 'pre-line', mt: 3 }}
-        >
-          {event.description}
-        </Typography>
+          <Typography variant="h6" color="text.secondary" gutterBottom>
+            {new Date(event.date).toLocaleDateString(undefined, {
+              weekday: 'long',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+            })}
+          </Typography>
 
-        {/* Additional Event Information Section */}
-        {(event.location || event.eventUrl) && (
-          <>
-            <Divider sx={{ my: 3 }} />
-            <Box sx={{ mt: 3 }}>
-              <Typography variant="h6" gutterBottom>
-                Event Information
-              </Typography>
+          {/* New Event Details Section */}
+          <Box sx={{ my: 3, display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+            {event.location && (
+              <Chip
+                icon={<LocationOnIcon />}
+                label={event.location}
+                variant="outlined"
+                sx={{ fontSize: '0.9rem' }}
+              />
+            )}
 
-              {event.location && (
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                  <LocationOnIcon sx={{ mr: 1, color: 'text.secondary' }} />
-                  <Typography variant="body2">
-                    <strong>Location:</strong> {event.location}
-                  </Typography>
-                </Box>
+            {event.price !== undefined && event.price !== null && (
+              <Chip
+                icon={<CurrencyPoundIcon />}
+                label={
+                  event.price === 0 ? 'Free' : `£${event.price.toFixed(2)}`
+                }
+                variant="outlined"
+                color={event.price === 0 ? 'success' : 'primary'}
+                sx={{ fontSize: '0.9rem' }}
+              />
+            )}
+
+            {event.eventUrl && (
+              <Chip
+                icon={<LinkIcon />}
+                label="Event Link"
+                variant="outlined"
+                component="a"
+                href={
+                  event.eventUrl.startsWith('http')
+                    ? event.eventUrl
+                    : `https://${event.eventUrl}`
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+                clickable
+                sx={{
+                  fontSize: '0.9rem',
+                  textDecoration: 'none',
+                  '&:hover': {
+                    backgroundColor: 'action.hover',
+                  },
+                }}
+              />
+            )}
+          </Box>
+
+          <Divider sx={{ my: 3 }} />
+
+          <Typography
+            variant="body1"
+            paragraph
+            sx={{ whiteSpace: 'pre-line', mt: 3 }}
+          >
+            {event.description}
+          </Typography>
+
+          {(event.location || event.eventUrl) && (
+            <>
+              <Divider sx={{ my: 3 }} />
+              <Box sx={{ mt: 3 }}>
+                <Typography variant="h6" gutterBottom>
+                  Event Information
+                </Typography>
+
+                {event.location && (
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                    <LocationOnIcon sx={{ mr: 1, color: 'text.secondary' }} />
+                    <Typography variant="body2">
+                      <strong>Location:</strong> {event.location}
+                    </Typography>
+                  </Box>
+                )}
+
+                {event.eventUrl && (
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                    <LinkIcon sx={{ mr: 1, color: 'text.secondary' }} />
+                    <Typography variant="body2">
+                      <strong>More Info:</strong>{' '}
+                      <Link
+                        href={
+                          event.eventUrl.startsWith('http')
+                            ? event.eventUrl
+                            : `https://${event.eventUrl}`
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Visit Event Page
+                      </Link>
+                    </Typography>
+                  </Box>
+                )}
+              </Box>
+            </>
+          )}
+
+          <Box sx={{ mt: 4, display: 'flex', justifyContent: 'space-between' }}>
+            <Typography variant="body2" color="text.secondary">
+              Created by: {event.createdBy}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Added on: {event.createdAt.toDate().toLocaleDateString()}
+            </Typography>
+          </Box>
+
+          {registrationError && (
+            <Alert severity="error" sx={{ mt: 2 }}>
+              {registrationError}
+            </Alert>
+          )}
+
+          <Box
+            sx={{
+              p: 2,
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: 2,
+            }}
+          >
+            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+              {user && isRegistered && (
+                <Button
+                  variant="outlined"
+                  color="error"
+                  onClick={handleCancelRegistration}
+                  disabled={registrationLoading}
+                >
+                  {registrationLoading ? (
+                    <CircularProgress size={24} />
+                  ) : (
+                    'Cancel Registration'
+                  )}
+                </Button>
               )}
-
-              {event.eventUrl && (
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                  <LinkIcon sx={{ mr: 1, color: 'text.secondary' }} />
-                  <Typography variant="body2">
-                    <strong>More Info:</strong>{' '}
-                    <Link
-                      href={
-                        event.eventUrl.startsWith('http')
-                          ? event.eventUrl
-                          : `https://${event.eventUrl}`
-                      }
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Visit Event Page
-                    </Link>
-                  </Typography>
-                </Box>
+              {user && !isRegistered && (
+                <Button
+                  variant="contained"
+                  onClick={handleSignUp}
+                  disabled={registrationLoading}
+                >
+                  {registrationLoading ? (
+                    <CircularProgress size={24} />
+                  ) : (
+                    'Register'
+                  )}
+                </Button>
+              )}
+              {!user && (
+                <Button
+                  variant="contained"
+                  onClick={() => navigate(`/login?redirect=/events/${id}`)}
+                >
+                  Sign Up to Register
+                </Button>
+              )}
+              {user && isRegistered && (
+                <AddToGoogleCalendarButton event={event} />
               )}
             </Box>
-          </>
-        )}
 
-        <Box sx={{ mt: 4, display: 'flex', justifyContent: 'space-between' }}>
-          <Typography variant="body2" color="text.secondary">
-            Created by: {event.createdBy}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Added on: {event.createdAt.toDate().toLocaleDateString()}
-          </Typography>
-        </Box>
-
-        {registrationError && (
-          <Alert severity="error" sx={{ mt: 2 }}>
-            {registrationError}
-          </Alert>
-        )}
-
-        <Box sx={{ p: 2, display: 'flex', gap: 2 }}>
-          {user && isRegistered && (
-            <Button
-              variant="outlined"
-              color="error"
-              onClick={handleCancelRegistration}
-              disabled={registrationLoading}
+            <Box
+              sx={{
+                display: 'flex',
+                gap: 2,
+                flexWrap: 'wrap',
+                alignItems: 'center',
+              }}
             >
-              {registrationLoading ? (
-                <CircularProgress size={24} />
-              ) : (
-                'Cancel Registration'
+              {isAdmin() && (
+                <>
+                  <Button
+                    variant="outlined"
+                    startIcon={<EditIcon />}
+                    onClick={handleEditEvent}
+                    size="small"
+                    sx={{ minWidth: 'auto' }}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    startIcon={<DeleteIcon />}
+                    onClick={() => setDeleteDialogOpen(true)}
+                    size="small"
+                    sx={{ minWidth: 'auto' }}
+                  >
+                    Delete
+                  </Button>
+                </>
               )}
-            </Button>
-          )}
-          {user && !isRegistered && (
-            <Button
-              variant="contained"
-              onClick={handleSignUp}
-              disabled={registrationLoading}
-            >
-              {registrationLoading ? (
-                <CircularProgress size={24} />
-              ) : (
-                'Register'
-              )}
-            </Button>
-          )}
-          {!user && (
-            <Button
-              variant="contained"
-              onClick={() => navigate(`/login?redirect=/events/${id}`)}
-            >
-              Sign Up to Register
-            </Button>
-          )}
-          {user && isRegistered && <AddToGoogleCalendarButton event={event} />}
-        </Box>
-        <Box sx={{ mt: 3, mb: 4 }}></Box>
-      </Paper>
+            </Box>
+          </Box>
 
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-        message={snackbarMessage}
-      />
-    </Container>
-  );
-}
+          <Box sx={{ mt: 3, mb: 4 }}></Box>
+        </Paper>
 
-/*
-  if (loading) {
-    return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="60vh"
-      >
-        <CircularProgress />
-      </Box>
-    );
-  }
+        <Snackbar
+          open={snackbarOpen}
+          autoHideDuration={6000}
+          onClose={handleCloseSnackbar}
+          message={snackbarMessage}
+        />
 
-  if (error || !event) {
-    return (
-      <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Button
-          startIcon={<ArrowBackIcon />}
-          onClick={handleGoBack}
-          sx={{ mb: 2 }}
+        <Dialog
+          open={deleteDialogOpen}
+          onClose={() => setDeleteDialogOpen(false)}
+          aria-labelledby="delete-dialog-title"
+          aria-describedby="delete-dialog-description"
         >
-          Back to Events
-        </Button>
-        <Alert severity="error">{error || 'Event not found'}</Alert>
+          <DialogTitle id="delete-dialog-title">Delete Event</DialogTitle>
+          <DialogContent>
+            <DialogContentText id="delete-dialog-description">
+              Are you sure you want to delete "{event?.title}"? This action
+              cannot be undone.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              onClick={() => setDeleteDialogOpen(false)}
+              disabled={deleting}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleDeleteEvent}
+              color="error"
+              variant="contained"
+              disabled={deleting}
+              startIcon={
+                deleting ? <CircularProgress size={16} /> : <DeleteIcon />
+              }
+            >
+              {deleting ? 'Deleting...' : 'Delete'}
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Container>
     );
   }
-
-  return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Button
-        startIcon={<ArrowBackIcon />}
-        onClick={handleGoBack}
-        sx={{ mb: 2 }}
-      >
-        Back to Events
-      </Button>
-
-      <Paper elevation={3} sx={{ p: 3 }}>
-        {event.imageUrl && (
-          <Box
-            sx={{
-              height: 300,
-              backgroundImage: `url(${event.imageUrl})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              borderRadius: 1,
-              mb: 3,
-            }}
-          />
-        )}
-
-        <Typography variant="h3" component="h1" gutterBottom>
-          {event.title}
-        </Typography>
-
-        <Typography variant="h6" color="text.secondary" gutterBottom>
-          {new Date(event.date).toLocaleDateString(undefined, {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-          })}
-        </Typography>
-
-        <Divider sx={{ my: 3 }} />
-
-        <Typography variant="body1" sx={{ whiteSpace: 'pre-line', mt: 3 }}>
-          {event.description}
-        </Typography>
-
-        <Box sx={{ my: 3, display: 'flex', flexWrap: 'wrap', gap: 2 }}>
-          {event.location && (
-            <Chip
-              icon={<LocationOnIcon />}
-              label={event.location}
-              variant="outlined"
-              sx={{ fontSize: '0.9rem' }}
-            />
-          )}
-          {event.price !== undefined && event.price !== null && (
-            <Chip
-              icon={<AttachMoneyIcon />}
-              label={event.price === 0 ? 'Free' : `$${event.price.toFixed(2)}`}
-              variant="outlined"
-              color={event.price === 0 ? 'success' : 'primary'}
-              sx={{ fontSize: '0.9rem' }}
-            />
-          )}
-          {event.eventUrl && (
-            <Chip
-              icon={<LinkIcon />}
-              label="Event Link"
-              variant="outlined"
-              component={Link}
-              href={event.eventUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              clickable
-              sx={{
-                fontSize: '0.9rem',
-                textDecoration: 'none',
-                '&:hover': {
-                  backgroundColor: 'action.hover',
-                },
-              }}
-            />
-          )}
-        </Box>
-
-        <Divider sx={{ my: 3 }} />
-
-        <Box sx={{ mt: 4, display: 'flex', justifyContent: 'space-between' }}>
-          <Typography variant="body2" color="text.secondary">
-            Created by: {event.createdBy}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Added on: {event.createdAt.toDate().toLocaleDateString()}
-          </Typography>
-        </Box>
-
-        {registrationError && (
-          <Alert severity="error" sx={{ mt: 2 }}>
-            {registrationError}
-          </Alert>
-        )}
-
-        <Box sx={{ p: 2, display: 'flex', gap: 2 }}>
-          {user && isRegistered && (
-            <Button
-              variant="outlined"
-              color="error"
-              onClick={handleCancelRegistration}
-              disabled={registrationLoading}
-            >
-              {registrationLoading ? (
-                <CircularProgress size={24} />
-              ) : (
-                'Cancel Registration'
-              )}
-            </Button>
-          )}
-          {user && !isRegistered && (
-            <Button
-              variant="contained"
-              onClick={handleSignUp}
-              disabled={registrationLoading}
-            >
-              {registrationLoading ? (
-                <CircularProgress size={24} />
-              ) : (
-                'Register'
-              )}
-            </Button>
-          )}
-          {!user && (
-            <Button
-              variant="contained"
-              onClick={() => navigate(`/login?redirect=/events/${id}`)}
-            >
-              Sign Up to Register
-            </Button>
-          )}
-          {user && isRegistered && <AddToGoogleCalendarButton event={event} />}
-        </Box>
-        <Box sx={{ mt: 3, mb: 4 }}></Box>
-      </Paper>
-
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-        message={snackbarMessage}
-      />
-    </Container>
-  );
-}*/
+}

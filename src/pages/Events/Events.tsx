@@ -19,11 +19,18 @@ import {
 } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import { useCallback, useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import EventCard from '../../components/EventCard/EventCard';
 import { useEvents, type Event } from '../../hooks/useFirestore';
 
 export default function Events() {
   const { events, loading, error, getEvents, addEvent } = useEvents();
+  const location = useLocation();
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>(
+    'success',
+  );
   const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
@@ -45,7 +52,6 @@ export default function Events() {
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const fetchEvents = useCallback(() => {
-    console.log('Fetching events...');
     getEvents();
   }, [getEvents]);
 
@@ -54,8 +60,6 @@ export default function Events() {
   }, []);
 
   useEffect(() => {
-    console.log('Filtering events...', events.length);
-
     let result = [...events];
 
     if (searchTerm) {
@@ -81,6 +85,17 @@ export default function Events() {
 
     setFilteredEvents(result);
   }, [events, searchTerm, sortBy]);
+
+  useEffect(() => {
+    if (location.state?.message) {
+      setSnackbarMessage(location.state.message);
+      setSnackbarSeverity(location.state.severity || 'success');
+      setSnackbarOpen(true);
+
+      // Clear the state to prevent showing the message again on refresh
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   const pageCount = Math.ceil(filteredEvents.length / eventsPerPage);
   const displayedEvents = filteredEvents.slice(
@@ -200,8 +215,6 @@ export default function Events() {
     );
   }
 
-  console.log('Rendering with events:', filteredEvents.length);
-
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Box
@@ -262,7 +275,6 @@ export default function Events() {
         <>
           <Grid container spacing={3}>
             {displayedEvents.map((event, index) => {
-              console.log(`Rendering event ${index}:`, event.id);
               return (
                 <Grid
                   size={{ xs: 12, sm: 6, md: 4 }}

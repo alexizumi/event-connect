@@ -6,6 +6,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Navbar from './components/Navbar/Navbar';
 import LoginPage from './pages/Auth/Login';
 import AdminPage from './pages/Dashboard/Dashboard';
+import EditEvent from './pages/Events/EditEvent';
 import EventDetails from './pages/Events/EventDetails';
 import EventsPage from './pages/Events/Events';
 import HomePage from './pages/Home/Home';
@@ -24,6 +25,7 @@ const App: React.FC = () => {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/admin" element={<AdminPage />} />
             <Route path="/events/:id" element={<EventDetails />} />
+            <Route path="/events/:id/edit" element={<EditEvent />} />
           </Routes>
         </Box>
       </Box>
