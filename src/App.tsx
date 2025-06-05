@@ -5,6 +5,7 @@ import React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Navbar from './components/Navbar/Navbar';
 import LoginPage from './pages/Auth/Login';
+import SignUp from './pages/Auth/SignUp';
 import AdminPage from './pages/Dashboard/Dashboard';
 import EditEvent from './pages/Events/EditEvent';
 import EventDetails from './pages/Events/EventDetails';
@@ -23,6 +24,7 @@ const App: React.FC = () => {
             <Route path="/" element={<HomePage />} />
             <Route path="/events" element={<EventsPage />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignUp />} />
             <Route path="/admin" element={<AdminPage />} />
             <Route path="/events/:id" element={<EventDetails />} />
             <Route path="/events/:id/edit" element={<EditEvent />} />

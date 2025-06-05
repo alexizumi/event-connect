@@ -13,21 +13,14 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import { deleteField } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-
-interface Event {
-  id: string;
-  title: string;
-  date: string;
-  description: string;
-  location?: string;
-  price?: number;
-  eventLink?: string;
-}
+import { useEvents, type Event } from '../../hooks/useFirestore';
 
 export default function EditEvent() {
   const { id } = useParams<{ id: string }>();
+  const { getEvent, updateEvent } = useEvents();
   const navigate = useNavigate();
 
   const [event, setEvent] = useState<Event | null>(null);
@@ -43,7 +36,9 @@ export default function EditEvent() {
     description: '',
     location: '',
     price: '',
-    eventLink: '',
+    eventUrl: '',
+    imageUrl: '',
+    createdBy: '',
   });
 
   useEffect(() => {
@@ -52,26 +47,35 @@ export default function EditEvent() {
 
   const fetchEvent = async () => {
     try {
-      const response = await fetch(`/api/events/${id}`);
-      if (response.ok) {
-        const eventData = await response.json();
-        setEvent(eventData);
-        setFormData({
-          title: eventData.title || '',
-          date: eventData.date || '',
-          description: eventData.description || '',
-          location: eventData.location || '',
-          price: eventData.price?.toString() || '',
-          eventLink: eventData.eventLink || '',
-        });
-      } else {
-        throw new Error('Failed to fetch event');
+      if (!id) {
+        throw new Error('Event ID is required');
       }
+      setLoading(true);
+      setError(null);
+      const event = await getEvent(id);
+
+      if (!event) {
+        throw new Error('Event not found');
+      }
+
+      setEvent(event);
+      setFormData({
+        title: event.title || '',
+        date: event.date || '',
+        description: event.description || '',
+        location: event.location || '',
+        price: event.price?.toString() || '',
+        eventUrl: event.eventUrl || '',
+        imageUrl: event.imageUrl || '',
+        createdBy: event.createdBy || '',
+      });
+      setLoading(false);
+      return event;
     } catch (error) {
       console.error('Error fetching event:', error);
       setError('Failed to load event details');
-    } finally {
       setLoading(false);
+      return null;
     }
   };
 
@@ -86,7 +90,6 @@ export default function EditEvent() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate required fields
     if (
       !formData.title.trim() ||
       !formData.date ||
@@ -97,35 +100,60 @@ export default function EditEvent() {
       return;
     }
 
+    if (formData.price && isNaN(parseFloat(formData.price))) {
+      setSnackbarMessage('Price must be a valid number');
+      setSnackbarOpen(true);
+      return;
+    }
+
+    if (
+      formData.eventUrl.trim() &&
+      !/^https?:\/\//.test(formData.eventUrl.trim())
+    ) {
+      setSnackbarMessage('Event URL must start with http:// or https://');
+      setSnackbarOpen(true);
+      return;
+    }
+
+    if (
+      formData.imageUrl?.trim() &&
+      !/^https?:\/\//.test(formData.imageUrl.trim())
+    ) {
+      setSnackbarMessage('Image URL must start with http:// or https://');
+      setSnackbarOpen(true);
+      return;
+    }
+
+    if (!id) {
+      setError('Event ID is required for updating');
+      setSnackbarMessage('Event ID is required for updating');
+      setSnackbarOpen(true);
+      return;
+    }
+
     setSaving(true);
+
     try {
-      const updateData = {
+      const updateData: any = {
         title: formData.title.trim(),
         date: formData.date,
         description: formData.description.trim(),
-        location: formData.location.trim() || undefined,
-        price: formData.price ? parseFloat(formData.price) : undefined,
-        eventLink: formData.eventLink.trim() || undefined,
+        location: formData.location.trim() || deleteField(),
+        price:
+          formData.price && !isNaN(parseFloat(formData.price))
+            ? parseFloat(formData.price)
+            : deleteField(),
+        eventUrl: formData.eventUrl.trim() || deleteField(),
+        imageUrl: formData.imageUrl?.trim() || deleteField(),
+        createdBy: formData.createdBy.trim() || deleteField(),
       };
 
-      const response = await fetch(`/api/events/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify(updateData),
-      });
+      const response = await updateEvent(id, updateData);
+      console.log('Event updated successfully:', response);
 
-      if (response.ok) {
-        setSnackbarMessage('Event updated successfully');
-        setSnackbarOpen(true);
-        setTimeout(() => {
-          navigate(`/events/${id}`);
-        }, 1500);
-      } else {
-        throw new Error('Failed to update event');
-      }
+      setSnackbarMessage('Event updated successfully!');
+      setSnackbarOpen(true);
+      navigate(`/events/${id}`);
     } catch (error) {
       console.error('Error updating event:', error);
       setSnackbarMessage('Failed to update event. Please try again.');
@@ -180,7 +208,7 @@ export default function EditEvent() {
           <TextField
             margin="dense"
             name="title"
-            label="Event Title *"
+            label="Event Title"
             type="text"
             fullWidth
             variant="outlined"
@@ -193,7 +221,7 @@ export default function EditEvent() {
           <TextField
             margin="dense"
             name="date"
-            label="Event Date *"
+            label="Event Date"
             type="date"
             fullWidth
             variant="outlined"
@@ -212,7 +240,7 @@ export default function EditEvent() {
           <TextField
             margin="dense"
             name="description"
-            label="Description *"
+            label="Description"
             multiline
             rows={4}
             fullWidth
@@ -225,8 +253,19 @@ export default function EditEvent() {
 
           <TextField
             margin="dense"
+            name="imageUrl"
+            label="Image URL (optional)"
+            fullWidth
+            variant="outlined"
+            value={formData.imageUrl}
+            onChange={handleInputChange}
+            sx={{ mb: 2 }}
+          />
+
+          <TextField
+            margin="dense"
             name="location"
-            label="Location (optional)"
+            label="Location"
             type="text"
             fullWidth
             variant="outlined"
@@ -254,15 +293,27 @@ export default function EditEvent() {
 
           <TextField
             margin="dense"
-            name="eventLink"
+            name="eventUrl"
             label="Event Link (optional)"
             type="url"
             fullWidth
             variant="outlined"
-            value={formData.eventLink}
+            value={formData.eventUrl}
             onChange={handleInputChange}
             sx={{ mb: 3 }}
             helperText="Full URL including https://"
+          />
+          <TextField
+            margin="dense"
+            name="createdBy"
+            label="Created By (optional)"
+            type="text"
+            fullWidth
+            variant="outlined"
+            value={formData.createdBy}
+            onChange={handleInputChange}
+            sx={{ mb: 2 }}
+            helperText="Name of the person or organization that created the event"
           />
 
           <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>

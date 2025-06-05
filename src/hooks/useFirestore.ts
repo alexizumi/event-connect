@@ -79,6 +79,7 @@ export const useEvents = () => {
   const updateEvent = async (id: string, eventData: Partial<Event>) => {
     try {
       const eventRef = doc(db, 'events', id);
+      console.log('Updating eventRef:', eventRef);
       await updateDoc(eventRef, eventData);
       return true;
     } catch (err) {

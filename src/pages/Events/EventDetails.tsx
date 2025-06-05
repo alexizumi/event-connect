@@ -30,12 +30,13 @@ import AddToGoogleCalendarButton from '../../components/AddToGoogleCalendarButto
 import { useAuth } from '../../hooks/useAuth';
 import { useEvents, type Event } from '../../hooks/useFirestore';
 import { useRegistrations } from '../../hooks/useRegistrations';
+import { getEventImageLarge } from '../../utils/imageHelpers';
 
 export default function EventDetails() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { getEvent } = useEvents();
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const { deleteEvent } = useEvents();
   const {
     registerForEvent,
@@ -128,13 +129,6 @@ export default function EventDetails() {
     setSnackbarOpen(false);
   };
 
-  // Add this function to check if user is admin (you'll need to implement based on your auth system)
-  const isAdmin = () => {
-    // Replace this with your actual admin check logic
-    // For example: return user?.role === 'admin' || user?.isAdmin
-    return true; // Temporary - replace with actual logic
-  };
-
   const handleDeleteEvent = async () => {
     if (!id) {
       setError('Event ID is missing');
@@ -168,6 +162,15 @@ export default function EventDetails() {
   };
 
   const handleEditEvent = () => {
+    if (!id) {
+      setError('Event ID is missing');
+      return;
+    }
+    const event = getEvent(id);
+    if (!event) {
+      setError('Event not found');
+      return;
+    }
     navigate(`/events/${id}/edit`);
   };
 
@@ -211,18 +214,16 @@ export default function EventDetails() {
         </Button>
 
         <Paper elevation={3} sx={{ p: 3 }}>
-          {event.imageUrl && (
-            <Box
-              sx={{
-                height: 300,
-                backgroundImage: `url(${event.imageUrl})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                borderRadius: 1,
-                mb: 3,
-              }}
-            />
-          )}
+          <Box
+            sx={{
+              height: 300,
+              backgroundImage: `url(${getEventImageLarge(event.imageUrl)})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              borderRadius: 1,
+              mb: 3,
+            }}
+          />
 
           <Typography variant="h3" component="h1" gutterBottom>
             {event.title}
@@ -409,7 +410,7 @@ export default function EventDetails() {
                 alignItems: 'center',
               }}
             >
-              {isAdmin() && (
+              {isAdmin && (
                 <>
                   <Button
                     variant="outlined"

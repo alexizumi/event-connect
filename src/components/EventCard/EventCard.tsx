@@ -11,12 +11,13 @@ import { Timestamp } from 'firebase/firestore';
 import { Link } from 'react-router-dom';
 import AddToGoogleCalendarButton from '../../components/AddToGoogleCalendarButton';
 import { type Event } from '../../hooks/useFirestore';
+import { getEventImage } from '../../utils/imageHelpers';
 
 interface EventCardProps {
   id: string;
   title: string;
   date: string;
-  imageUrl: string;
+  imageUrl?: string;
   description: string;
 }
 
@@ -27,6 +28,14 @@ const EventCard = ({
   imageUrl,
   description,
 }: EventCardProps) => {
+  // // Debug logs temporários
+  // console.log('EventCard props:', { id, title, date, imageUrl, description });
+  // console.log('imageUrl type:', typeof imageUrl);
+  // console.log('imageUrl value:', imageUrl);
+
+  // const finalImageUrl = getEventImage(imageUrl);
+  // console.log('Final image URL:', finalImageUrl);
+
   const event: Event = {
     id,
     title,
@@ -49,7 +58,7 @@ const EventCard = ({
       <CardMedia
         component="img"
         height="140"
-        image={imageUrl || '/placeholder-event.jpg'}
+        image={getEventImage(imageUrl)}
         alt={title}
       />
       <CardContent sx={{ flexGrow: 1 }}>

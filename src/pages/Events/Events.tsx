@@ -288,7 +288,7 @@ export default function Events() {
                       month: 'long',
                       day: 'numeric',
                     })}
-                    imageUrl={event.imageUrl || '/placeholder-event.jpg'}
+                    imageUrl={event.imageUrl}
                     description={event.description}
                   />
                 </Grid>
@@ -390,7 +390,7 @@ export default function Events() {
           <TextField
             margin="dense"
             name="location"
-            label="Location (optional)"
+            label="Location"
             type="text"
             fullWidth
             variant="outlined"
@@ -399,7 +399,7 @@ export default function Events() {
             sx={{ mb: 2 }}
             required
             placeholder="Enter the event location"
-            helperText="Enter the location of the event (optional)"
+            helperText="Enter the location of the event"
           />
           <TextField
             margin="dense"

@@ -17,6 +17,7 @@ const SignUp = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [displayName, setDisplayName] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const { signUp } = useAuth();
@@ -41,8 +42,8 @@ const SignUp = () => {
     setLoading(true);
 
     try {
-      await signUp(email, password);
-      navigate('/dashboard');
+      await signUp(email, password, displayName);
+      navigate('/login', { replace: true });
     } catch (err: any) {
       setError(err.message || 'Failed to create account');
       console.error(err);
@@ -66,6 +67,18 @@ const SignUp = () => {
           )}
 
           <Box component="form" onSubmit={handleSubmit} noValidate>
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="displayName"
+              label="Display Name"
+              name="displayName"
+              autoComplete="name"
+              autoFocus
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+            />
             <TextField
               margin="normal"
               required
