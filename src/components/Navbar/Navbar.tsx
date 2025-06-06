@@ -48,7 +48,7 @@ const Navbar: React.FC = () => {
             >
               Events
             </Button>
-            {isAdmin && (
+            {/* {isAdmin && (
               <Button
                 component={RouterLink}
                 to="/admin"
@@ -56,7 +56,7 @@ const Navbar: React.FC = () => {
               >
                 Admin
               </Button>
-            )}
+            )} */}
           </Box>
 
           <Box>
