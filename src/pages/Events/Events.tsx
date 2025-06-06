@@ -19,7 +19,6 @@ import {
 } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import { useCallback, useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
 import EventCard from '../../components/EventCard/EventCard';
 import { useAuth } from '../../hooks/useAuth';
 import { useEvents, type Event } from '../../hooks/useFirestore';
@@ -27,9 +26,6 @@ import { useEvents, type Event } from '../../hooks/useFirestore';
 export default function Events() {
   const { events, loading, error, getEvents, addEvent } = useEvents();
   const { isAdmin } = useAuth();
-  const location = useLocation();
-
-  // Removidas as variáveis não utilizadas: snackbarOpen, snackbarMessage, snackbarSeverity
 
   const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
   const [page, setPage] = useState(1);
