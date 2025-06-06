@@ -338,7 +338,7 @@ export default function EventDetails() {
 
           <Box sx={{ mt: 4, display: 'flex', justifyContent: 'space-between' }}>
             <Typography variant="body2" color="text.secondary">
-              Created by: {event.createdBy}
+              Organizer: {event.createdBy}
             </Typography>
             <Typography variant="body2" color="text.secondary">
               Added on: {event.createdAt.toDate().toLocaleDateString()}

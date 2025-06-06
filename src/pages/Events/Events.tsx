@@ -437,8 +437,8 @@ export default function Events() {
           />
           <TextField
             margin="dense"
-            name="createdBy"
-            label="Created By"
+            name="organizer"
+            label="Organizer Name"
             type="text"
             fullWidth
             variant="outlined"

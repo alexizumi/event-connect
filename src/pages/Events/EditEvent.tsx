@@ -305,8 +305,8 @@ export default function EditEvent() {
           />
           <TextField
             margin="dense"
-            name="createdBy"
-            label="Created By (optional)"
+            name="organizer"
+            label="Organizer Name (optional)"
             type="text"
             fullWidth
             variant="outlined"
