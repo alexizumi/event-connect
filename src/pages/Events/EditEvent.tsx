@@ -16,14 +16,14 @@ import {
 import { deleteField } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useEvents, type Event } from '../../hooks/useFirestore';
+import { useEvents } from '../../hooks/useFirestore';
 
 export default function EditEvent() {
   const { id } = useParams<{ id: string }>();
   const { getEvent, updateEvent } = useEvents();
   const navigate = useNavigate();
 
-  const [event, setEvent] = useState<Event | null>(null);
+  // const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -58,7 +58,7 @@ export default function EditEvent() {
         throw new Error('Event not found');
       }
 
-      setEvent(event);
+      // setEvent(event);
       setFormData({
         title: event.title || '',
         date: event.date || '',

@@ -28,11 +28,9 @@ export default function Events() {
   const { events, loading, error, getEvents, addEvent } = useEvents();
   const { isAdmin } = useAuth();
   const location = useLocation();
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>(
-    'success',
-  );
+
+  // Removidas as variáveis não utilizadas: snackbarOpen, snackbarMessage, snackbarSeverity
+
   const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
@@ -88,16 +86,7 @@ export default function Events() {
     setFilteredEvents(result);
   }, [events, searchTerm, sortBy]);
 
-  useEffect(() => {
-    if (location.state?.message) {
-      setSnackbarMessage(location.state.message);
-      setSnackbarSeverity(location.state.severity || 'success');
-      setSnackbarOpen(true);
-
-      // Clear the state to prevent showing the message again on refresh
-      window.history.replaceState({}, document.title);
-    }
-  }, [location.state]);
+  // Removido o useEffect que utilizava as variáveis do snackbar não utilizadas
 
   const pageCount = Math.ceil(filteredEvents.length / eventsPerPage);
   const displayedEvents = filteredEvents.slice(
@@ -105,8 +94,9 @@ export default function Events() {
     page * eventsPerPage,
   );
 
+  // Corrigido: removido o parâmetro 'event' não utilizado
   const handlePageChange = (
-    event: React.ChangeEvent<unknown>,
+    _event: React.ChangeEvent<unknown>,
     value: number,
   ) => {
     setPage(value);

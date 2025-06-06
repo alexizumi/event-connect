@@ -7,9 +7,7 @@ import {
   CardMedia,
   Typography,
 } from '@mui/material';
-import { Timestamp } from 'firebase/firestore';
 import { Link } from 'react-router-dom';
-import { type Event } from '../../hooks/useFirestore';
 import { getEventImage } from '../../utils/imageHelpers';
 
 interface EventCardProps {
@@ -27,16 +25,6 @@ const EventCard = ({
   imageUrl,
   description,
 }: EventCardProps) => {
-  const event: Event = {
-    id,
-    title,
-    date,
-    description,
-    imageUrl,
-    createdBy: 'Unknown',
-    createdAt: new Timestamp(Date.now() / 1000, 0),
-  };
-
   return (
     <Card
       sx={{
