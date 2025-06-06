@@ -4,24 +4,24 @@ import { createTheme } from '@mui/material/styles';
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#1976d2',
-      light: '#42a5f5',
-      dark: '#1565c0',
+      main: '#56A3A6', // Verdigris - teal vibrant
+      light: '#7BB8BB',
+      dark: '#3D7275',
       contrastText: '#fff',
     },
     secondary: {
-      main: '#f50057',
-      light: '#ff4081',
-      dark: '#c51162',
-      contrastText: '#fff',
+      main: '#CAD49D', // Sage - light green
+      light: '#D8E0B4',
+      dark: '#B5C285',
+      contrastText: '#484538',
     },
     background: {
-      default: '#f5f5f5',
+      default: '#FAFBFA', // White slightly green
       paper: '#ffffff',
     },
     text: {
-      primary: '#333333',
-      secondary: '#757575',
+      primary: '#484538', // Black Olive - Main text
+      secondary: '#6B6B5A',
     },
   },
   typography: {
@@ -101,7 +101,7 @@ const theme = createTheme({
         contained: {
           boxShadow: 'none',
           '&:hover': {
-            boxShadow: '0px 2px 4px rgba(0,0,0,0.2)',
+            boxShadow: '0px 2px 4px rgba(86, 163, 166, 0.3)',
           },
         },
       },
@@ -110,14 +110,14 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: 12,
-          boxShadow: '0px 3px 6px rgba(0,0,0,0.1)',
+          boxShadow: '0px 3px 6px rgba(72, 69, 56, 0.1)', // Sombra com a cor do texto
         },
       },
     },
     MuiAppBar: {
       styleOverrides: {
         root: {
-          boxShadow: '0px 1px 3px rgba(0,0,0,0.1)',
+          boxShadow: '0px 1px 3px rgba(86, 163, 166, 0.2)', // Sombra com a cor primary
         },
       },
     },
