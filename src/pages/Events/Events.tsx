@@ -21,10 +21,12 @@ import Grid from '@mui/material/Grid';
 import { useCallback, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import EventCard from '../../components/EventCard/EventCard';
+import { useAuth } from '../../hooks/useAuth';
 import { useEvents, type Event } from '../../hooks/useFirestore';
 
 export default function Events() {
   const { events, loading, error, getEvents, addEvent } = useEvents();
+  const { isAdmin } = useAuth();
   const location = useLocation();
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -228,15 +230,16 @@ export default function Events() {
         <Typography variant="h3" component="h1">
           Events
         </Typography>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleOpenNewEventDialog}
-        >
-          Add New Event
-        </Button>
+        {isAdmin && (
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleOpenNewEventDialog}
+          >
+            Add New Event
+          </Button>
+        )}
       </Box>
-
       <Box sx={{ mb: 4 }}>
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, md: 6 }}>
