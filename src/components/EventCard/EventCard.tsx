@@ -9,7 +9,6 @@ import {
 } from '@mui/material';
 import { Timestamp } from 'firebase/firestore';
 import { Link } from 'react-router-dom';
-import AddToGoogleCalendarButton from '../../components/AddToGoogleCalendarButton';
 import { type Event } from '../../hooks/useFirestore';
 import { getEventImage } from '../../utils/imageHelpers';
 
@@ -28,14 +27,6 @@ const EventCard = ({
   imageUrl,
   description,
 }: EventCardProps) => {
-  // // Debug logs temporários
-  // console.log('EventCard props:', { id, title, date, imageUrl, description });
-  // console.log('imageUrl type:', typeof imageUrl);
-  // console.log('imageUrl value:', imageUrl);
-
-  // const finalImageUrl = getEventImage(imageUrl);
-  // console.log('Final image URL:', finalImageUrl);
-
   const event: Event = {
     id,
     title,
@@ -84,9 +75,9 @@ const EventCard = ({
           View Details
         </Button>
       </Box>
-      <Box sx={{ p: 2 }}>
+      {/* <Box sx={{ p: 2 }}>
         <AddToGoogleCalendarButton event={event} />
-      </Box>
+      </Box> */}
     </Card>
   );
 };

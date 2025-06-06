@@ -262,6 +262,22 @@ export default function Events() {
                 value={sortBy}
                 label="Sort by"
                 onChange={(e) => setSortBy(e.target.value)}
+                MenuProps={{
+                  PaperProps: {
+                    style: {
+                      maxHeight: 300,
+                    },
+                  },
+                  anchorOrigin: {
+                    vertical: 'bottom',
+                    horizontal: 'left',
+                  },
+                  transformOrigin: {
+                    vertical: 'top',
+                    horizontal: 'left',
+                  },
+                  disableScrollLock: true,
+                }}
               >
                 <MenuItem value="date">Event Date (newest first)</MenuItem>
                 <MenuItem value="title">Title (A-Z)</MenuItem>

@@ -63,6 +63,35 @@ const theme = createTheme({
     },
   },
   components: {
+    MuiSelect: {
+      styleOverrides: {
+        root: {
+          '& .MuiSelect-select': {
+            '&:focus': {
+              backgroundColor: 'transparent',
+            },
+          },
+        },
+      },
+    },
+    MuiMenu: {
+      styleOverrides: {
+        paper: {
+          maxHeight: '300px',
+        },
+      },
+    },
+    MuiCssBaseline: {
+      styleOverrides: {
+        html: {
+          scrollbarGutter: 'stable',
+          overflowY: 'scroll',
+        },
+        body: {
+          scrollbarWidth: 'thin',
+        },
+      },
+    },
     MuiButton: {
       styleOverrides: {
         root: {
