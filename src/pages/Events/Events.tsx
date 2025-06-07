@@ -39,7 +39,7 @@ export default function Events() {
     date: new Date().toISOString().split('T')[0],
     description: '',
     imageUrl: '',
-    createdBy: 'Current User',
+    createdBy: 'Organiser Name',
     location: '',
     price: 0,
     eventUrl: '',
@@ -82,15 +82,12 @@ export default function Events() {
     setFilteredEvents(result);
   }, [events, searchTerm, sortBy]);
 
-  // Removido o useEffect que utilizava as variáveis do snackbar não utilizadas
-
   const pageCount = Math.ceil(filteredEvents.length / eventsPerPage);
   const displayedEvents = filteredEvents.slice(
     (page - 1) * eventsPerPage,
     page * eventsPerPage,
   );
 
-  // Corrigido: removido o parâmetro 'event' não utilizado
   const handlePageChange = (
     _event: React.ChangeEvent<unknown>,
     value: number,
