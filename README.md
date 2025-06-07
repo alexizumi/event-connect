@@ -66,8 +66,10 @@ EventConnect is a sleek, intuitive platform that connects communities through ev
 
 1. **Clone the repository**
 
+```bash
 git clone https://github.com/alexizumi/event-connect.git
 cd event-connect
+```
 
 2. **Install dependencies**
 
@@ -158,26 +160,26 @@ yarn build
 
 ## 🔍 Project Structure
 
-event-connect/
-├── public/ # Static assets
-├── src/
-│ ├── assets/ # Images, fonts, etc.
-│ ├── components/ # Reusable UI components
-│ ├── constants/ # Constant information
-│ ├── context/ # React context providers
-│ ├── hooks/ # Custom React hooks
-│ ├── pages/ # Page components
-│ ├── services/ # API and Firebase services
-│ ├── styles/ # Global styles and themes
-│ ├── utils/ # Utility functions
-│ ├── App.tsx # Main application component
-│ └── main.tsx # Entry point
-├── .env.example # Example environment variables
-├── .gitignore # Git ignore file
-├── index.html # HTML template
-├── package.json # Dependencies and scripts
-├── tsconfig.json # TypeScript configuration
-└── vite.config.ts # Vite configuration
+event-connect/\
+├── public/ # Static assets\
+├── src/\
+│ ├── assets/ # Images, fonts, etc.\
+│ ├── components/ # Reusable UI components\
+│ ├── constants/ # Constant information\
+│ ├── context/ # React context providers\
+│ ├── hooks/ # Custom React hooks\
+│ ├── pages/ # Page components\
+│ ├── services/ # API and Firebase services\
+│ ├── styles/ # Global styles and themes\
+│ ├── utils/ # Utility functions\
+│ ├── App.tsx # Main application component\
+│ └── main.tsx # Entry point\
+├── .env.example # Example environment variables\
+├── .gitignore # Git ignore file\
+├── index.html # HTML template\
+├── package.json # Dependencies and scripts\
+├── tsconfig.json # TypeScript configuration\
+└── vite.config.ts # Vite configuration\
 
 ## 🔧 Troubleshooting
 

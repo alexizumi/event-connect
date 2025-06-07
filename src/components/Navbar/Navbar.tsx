@@ -48,6 +48,27 @@ const Navbar: React.FC = () => {
             >
               Events
             </Button>
+            <Button
+              component={RouterLink}
+              to="/pricing"
+              sx={{ color: 'white', display: 'block', mx: 1 }}
+            >
+              Pricing
+            </Button>
+            <Button
+              component={RouterLink}
+              to="/about"
+              sx={{ color: 'white', display: 'block', mx: 1 }}
+            >
+              About Us
+            </Button>
+            <Button
+              component={RouterLink}
+              to="/contact"
+              sx={{ color: 'white', display: 'block', mx: 1 }}
+            >
+              Contact
+            </Button>
             {/* {isAdmin && (
               <Button
                 component={RouterLink}
