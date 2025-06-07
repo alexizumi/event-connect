@@ -13,7 +13,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 
 const Navbar: React.FC = () => {
-  const { user, isAdmin, signOut } = useAuth();
+  const { user, signOut } = useAuth();
 
   return (
     <AppBar position="static" sx={{ width: '100%' }}>
