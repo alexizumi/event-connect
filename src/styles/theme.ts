@@ -81,17 +81,6 @@ const theme = createTheme({
         },
       },
     },
-    MuiCssBaseline: {
-      styleOverrides: {
-        html: {
-          scrollbarGutter: 'stable',
-          overflowY: 'scroll',
-        },
-        body: {
-          scrollbarWidth: 'thin',
-        },
-      },
-    },
     MuiButton: {
       styleOverrides: {
         root: {
@@ -110,14 +99,50 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: 12,
-          boxShadow: '0px 3px 6px rgba(72, 69, 56, 0.1)', // Sombra com a cor do texto
+          boxShadow: '0px 3px 6px rgba(72, 69, 56, 0.1)',
         },
       },
     },
     MuiAppBar: {
       styleOverrides: {
         root: {
-          boxShadow: '0px 1px 3px rgba(86, 163, 166, 0.2)', // Sombra com a cor primary
+          boxShadow: '0px 1px 3px rgba(86, 163, 166, 0.2)',
+        },
+      },
+    },
+    MuiDrawer: {
+      styleOverrides: {
+        root: {
+          '& .MuiModal-root': {
+            position: 'fixed !important',
+          },
+          '& .MuiBackdrop-root': {
+            position: 'fixed !important',
+          },
+        },
+        paper: {
+          position: 'fixed',
+        },
+      },
+    },
+    MuiModal: {
+      styleOverrides: {
+        root: {
+          position: 'fixed',
+        },
+      },
+    },
+    MuiCssBaseline: {
+      styleOverrides: {
+        html: {
+          scrollbarGutter: 'stable',
+          overflowY: 'scroll',
+        },
+        body: {
+          scrollbarWidth: 'thin',
+          '&.MuiModal-root-open': {
+            paddingRight: '0px !important',
+          },
         },
       },
     },
