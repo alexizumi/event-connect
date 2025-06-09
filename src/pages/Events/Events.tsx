@@ -39,7 +39,7 @@ export default function Events() {
     date: new Date().toISOString().split('T')[0],
     description: '',
     imageUrl: '',
-    createdBy: 'Organiser Name',
+    createdBy: '',
     location: '',
     price: 0,
     eventUrl: '',
@@ -107,7 +107,7 @@ export default function Events() {
       date: new Date().toISOString().split('T')[0],
       description: '',
       imageUrl: '',
-      createdBy: 'Current User',
+      createdBy: '',
       location: '',
       price: 0,
       eventUrl: '',
@@ -436,13 +436,16 @@ export default function Events() {
           />
           <TextField
             margin="dense"
-            name="organizer"
+            name="createdBy"
             label="Organizer Name"
             type="text"
             fullWidth
             variant="outlined"
             value={newEventData.createdBy}
             onChange={handleInputChange}
+            sx={{ mb: 2 }}
+            placeholder="Enter the name of the organizer"
+            helperText="Enter the name of the person or organization organizing the event"
             required
           />
         </DialogContent>
