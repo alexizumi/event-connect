@@ -21,6 +21,7 @@ import {
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useEvents, type Event } from '../../hooks/useFirestore';
+import { getEventImage, handleImageError } from '../../utils/imageHelpers';
 
 export default function Home() {
   const theme = useTheme();
@@ -237,8 +238,9 @@ export default function Home() {
                     <CardMedia
                       component="img"
                       height="200"
-                      image={event.imageUrl || '/api/placeholder/400/200'}
+                      image={getEventImage(event.imageUrl)} // image={event.imageUrl || '/api/placeholder/400/200'}
                       alt={event.title}
+                      onError={handleImageError}
                       sx={{ objectFit: 'cover' }}
                     />
                     <CardContent sx={{ flexGrow: 1, p: 3 }}>
@@ -344,8 +346,9 @@ export default function Home() {
                   <CardMedia
                     component="img"
                     sx={{ width: 120, objectFit: 'cover' }}
-                    image={event.imageUrl || '/api/placeholder/120/140'}
+                    image={getEventImage(event.imageUrl)} //  image={event.imageUrl || '/api/placeholder/120/140'}
                     alt={event.title}
+                    onError={handleImageError}
                   />
                   <CardContent sx={{ flex: 1, p: 2 }}>
                     <Typography

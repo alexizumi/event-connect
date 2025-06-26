@@ -16,3 +16,8 @@ export const getEventImageLarge = (imageUrl?: string | null): string => {
   }
   return DEFAULT_EVENT_IMAGE_LARGE;
 };
+export const handleImageError = (
+  e: React.SyntheticEvent<HTMLImageElement, Event>,
+) => {
+  e.currentTarget.src = '/No-Image.png';
+};
