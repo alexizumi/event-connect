@@ -238,7 +238,7 @@ export default function Home() {
                     <CardMedia
                       component="img"
                       height="200"
-                      image={getEventImage(event.imageUrl)} // image={event.imageUrl || '/api/placeholder/400/200'}
+                      image={getEventImage(event.imageUrl)}
                       alt={event.title}
                       onError={handleImageError}
                       sx={{ objectFit: 'cover' }}
@@ -346,7 +346,7 @@ export default function Home() {
                   <CardMedia
                     component="img"
                     sx={{ width: 120, objectFit: 'cover' }}
-                    image={getEventImage(event.imageUrl)} //  image={event.imageUrl || '/api/placeholder/120/140'}
+                    image={getEventImage(event.imageUrl)}
                     alt={event.title}
                     onError={handleImageError}
                   />
